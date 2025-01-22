@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trading Bot Interface</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background-color: #f4f4f9;
+            margin: 0;
+            padding: 0;
+        }
+        h1 {
+            background-color: #4CAF50;
+            color: white;
+            padding: 15px;
+        }
+        .container {
+            max-width: 400px;
+            margin: 50px auto;
+            padding: 20px;
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        button {
+            display: inline-block;
+            margin: 10px 5px;
+            padding: 10px 20px;
+            font-size: 16px;
+            color: white;
+            background-color: #4CAF50;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+        button#stop-btn {
+            background-color: #f44336;
+        }
+        button:hover:not(:disabled) {
+            opacity: 0.9;
+        }
+        #status {
+            margin-top: 20px;
+            font-size: 18px;
+            color: #333;
+        }
+        #status.running {
+            color: #4CAF50;
+        }
+        #status.stopped {
+            color: #f44336;
+        }
+    </style>
+</head>
+<body>
+    <h1>Trading Bot Interface</h1>
+    <div class="container">
+        <button id="start-btn">Start Trading</button>
+        <button id="stop-btn" disabled>Stop Trading</button>
+        <p id="status" class="stopped">Status: Not Running</p>
+    </div>
+
+    <script>
+        function updateStatus(isRunning) {
+            if (isRunning) {
+                $("#status").text("Status: Running").removeClass("stopped").addClass("running");
+                $("#start-btn").prop("disabled", true);
+                $("#stop-btn").prop("disabled", false);
+            } else {
+                $("#status").text("Status: Not Running").removeClass("running").addClass("stopped");
+                $("#start-btn").prop("disabled", false);
+                $("#stop-btn").prop("disabled", true);
+            }
+        }
+
+        // Start bot
+        $("#start-btn").click(function () {
+            $.post("/start", function (data) {
+                if (data.status.includes("started")) {
+                    updateStatus(true);
+                } else {
+                    alert(data.status);
+                }
+            });
+        });
+
+        // Stop bot
+        $("#stop-btn").click(function () {
+            $.post("/stop", function (data) {
+                if (data.status.includes("stopped")) {
+                    updateStatus(false);
+                } else {
+                    alert(data.status);
+                }
+            });
+        });
+    </script>
+</body>
+</html>
